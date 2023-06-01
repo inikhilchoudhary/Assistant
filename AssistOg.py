@@ -8,6 +8,7 @@ import pyjokes
 import random
 import geocoder
 import requests
+import threading
 
 listener = sr.Recognizer()
 engine = pyttsx3.init()
@@ -46,7 +47,7 @@ def find_nearby_food_shops(latitude, longitude):
             places.append(result['name'])
     return places
 
-def run_ng():
+def run_ng(output_label):
     while True:
         command = take_command()
         if command:
@@ -136,7 +137,7 @@ def run_ng():
                 break
 
 def on_button_click():
-    run_ng()
+    threading.Thread(target=run_ng, args=(output_label,)).start()
 
 # Create the GUI window
 T = Tk()
