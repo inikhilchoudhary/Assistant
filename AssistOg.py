@@ -1,3 +1,4 @@
+from tkinter import *
 import speech_recognition as sr
 import pyttsx3
 import pywhatkit
@@ -6,6 +7,7 @@ import wikipedia
 import pyjokes
 import random
 import geocoder
+import requests
 
 listener = sr.Recognizer()
 engine = pyttsx3.init()
@@ -21,68 +23,133 @@ def talk(text):
 def take_command():
     try:
         with sr.Microphone() as source:
-            print('Listening...')
             listener.adjust_for_ambient_noise(source)
-            audio = listener.listen(source, timeout=3)  # Set a timeout of 3 seconds for listening
+            audio = listener.listen(source, timeout=1)  # Set a timeout of 1 second for listening
         command = listener.recognize_google(audio)
         command = command.lower()
         if 'ng' in command:
             command = command.replace('ng', '')
-            print(command)
         return command
     except sr.UnknownValueError:
         return ''
     except sr.RequestError:
-        print('Could not connect to the speech recognition service.')
         return ''
+
+def find_nearby_food_shops(latitude, longitude):
+    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={latitude},{longitude}&radius=500&keyword=food&key=YOUR_API_KEY"
+    response = requests.get(url)
+    data = response.json()
+
+    places = []
+    if data['status'] == 'OK':
+        for result in data['results']:
+            places.append(result['name'])
+    return places
 
 def run_ng():
     while True:
         command = take_command()
         if command:
-            print(command)
-            if 'play' in command:
-                song = command.replace('play', '')
-                talk('Playing ' + song)
-                pywhatkit.playonyt(song)
-            elif 'time' in command:
+            if 'time' in command:
                 current_time = datetime.datetime.now().strftime('%I:%M %p')
-                talk('The current time is ' + current_time)
+                response_text = 'The current time is ' + current_time
+                talk(response_text)
+                output_label.config(text=response_text)
             elif 'who is' in command:
                 person = command.replace('who is', '')
                 try:
                     info = wikipedia.summary(person, 1)
-                    print(info)
-                    talk(info)
-                except wikipedia.exceptions.DisambiguationError as e:
-                    talk('There are multiple results. Please be more specific.')
-            elif 'date' in command:
-                talk('Sorry, I have a headache')
+                    response_text = info
+                    talk(response_text)
+                    output_label.config(text=response_text)
+                except wikipedia.exceptions.DisambiguationError:
+                    response_text = 'There are multiple results. Please be more specific.'
+                    talk(response_text)
+                    output_label.config(text=response_text)
+            elif 'play' in command:
+                song = command.replace('play', '')
+                response_text = 'Playing ' + song
+                talk(response_text)
+                output_label.config(text=response_text)
+                pywhatkit.playonyt(song)
             elif 'are you single' in command:
-                talk('I am in a relationship with Wi-Fi')
+                response_text = 'I am in a relationship with Wi-Fi'
+                talk(response_text)
+                output_label.config(text=response_text)
             elif 'joke' in command:
-                talk(pyjokes.get_joke())
-            elif 'location' in command:
-                location = geocoder.ip('me')
-                talk('Your current location is ' + location.city)
+                joke = pyjokes.get_joke()
+                response_text = joke
+                talk(response_text)
+                output_label.config(text=response_text)
+            elif 'date' in command:
+                response_text = 'Sorry, I have a headache'
+                talk(response_text)
+                output_label.config(text=response_text)
             elif 'how are you' in command:
                 HruResponse = ['I am good, what about you?', 'I am great and you?', 'Great, thank you. How are you?', 'Fine, thanks. It\'s a beautiful day.']
-                talk(random.choice(HruResponse))
+                response_text = random.choice(HruResponse)
+                talk(response_text)
+                output_label.config(text=response_text)
+            elif 'what is my current location' in command:
+                location = geocoder.ip('me')
+                response_text = 'Your current location is ' + location.city
+                talk(response_text)
+                output_label.config(text=response_text)
+            elif 'food' in command or 'restaurant' in command:
+                location = geocoder.ip('me')
+                user_location = location.latlng
+                if user_location:
+                    places = find_nearby_food_shops(user_location[0], user_location[1])
+                    if places:
+                        response_text = "Here are some nearby food shops or famous restaurants:\n" + "\n".join(places)
+                        talk(response_text)
+                        output_label.config(text=response_text)
+                    else:
+                        response_text = "Sorry, I couldn't find any nearby food shops or famous restaurants."
+                        talk(response_text)
+                        output_label.config(text=response_text)
+                else:
+                    response_text = "Sorry, I couldn't determine your current location."
+                    talk(response_text)
+                    output_label.config(text=response_text)
+            elif 'stop' in command or 'exit' in command:
+                response_text = 'Goodbye.'
+                talk(response_text)
+                output_label.config(text=response_text)
+                break
             else:
-                talk('Sorry, I did not understand that command.')
-                
+                response_text = 'Sorry, I did not understand that command.'
+                talk(response_text)
+                output_label.config(text=response_text)
+
             talk('Anything more?')  # Ask for further questions
             response = take_command()  # Get the user's response
-            if response:
-                if 'no' in response:
-                    talk('Goodbye.')
-                    break
+            if response and ('no' in response or 'stop' in response or 'exit' in response):
+                response_text = 'Goodbye.'
+                talk(response_text)
+                output_label.config(text=response_text)
+                break
+            elif response:
+                command = response
+                continue
             else:
-                continue  # Continue to the next iteration of the loop
+                break
 
-# Only initialize once outside the loop
-with sr.Microphone() as source:
-    listener.adjust_for_ambient_noise(source)
-
-while True:
+def on_button_click():
     run_ng()
+
+# Create the GUI window
+T = Tk()
+T.title("Voice Assistant")
+T.geometry("400x400")
+
+# Create a button
+button = Button(T, text="Click to Speak", command=on_button_click)
+button.pack(pady=20)
+
+# Create a label to display the output
+output_label = Label(T, text="")
+output_label.pack(pady=20)
+
+# Run the GUI event loop
+T.mainloop()
