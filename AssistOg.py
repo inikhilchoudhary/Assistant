@@ -141,11 +141,14 @@ def on_button_click():
 
 # Create the GUI window
 T = Tk()
-T.title("Voice Assistant")
+T.title("HelpU")
 T.geometry("400x400")
 
+# For Icon of GUI window
+T.iconbitmap("AssistantIcon.ico")
+
 # Create a button
-button = Button(T, text="Click to Speak", command=on_button_click)
+button = Button(T, text="Tab To Run", command=on_button_click)
 button.pack(pady=20)
 
 # Create a label to display the output
