@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk
 import speech_recognition as sr
 import pyttsx3
 import pywhatkit
@@ -147,9 +148,13 @@ T.geometry("400x400")
 button = Button(T, text="Click to Speak", command=on_button_click)
 button.pack(pady=20)
 
+# Create a frame for the output label
+output_frame = ttk.Frame(T, padding=10)
+output_frame.pack()
+
 # Create a label to display the output
-output_label = Label(T, text="")
-output_label.pack(pady=20)
+output_label = ttk.Label(output_frame, text="", font=("Arial", 12), wraplength=350)
+output_label.pack()
 
 # Run the GUI event loop
 T.mainloop()
