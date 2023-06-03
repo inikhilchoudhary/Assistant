@@ -1,3 +1,7 @@
+
+![Assitant](https://github.com/inikhilchoudhary/Assistant/assets/94347474/39b73f4f-07fa-44cc-80cb-1c8c62895bee)
+
+
 # HelpU Voice Assistant
 
 HelpU is a voice assistant program built using Python and tkinter GUI library. It utilizes various libraries such as speech_recognition, pyttsx3, pywhatkit, datetime, wikipedia, pyjokes, random, geocoder, requests, threading, and PIL (Python Imaging Library) to provide a range of functionalities.
