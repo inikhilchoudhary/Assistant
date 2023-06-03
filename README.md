@@ -24,7 +24,7 @@ HelpU is a voice assistant program built using Python and tkinter GUI library. I
 
 1. Clone the repository or download the ZIP file.
 
-git clone :- 
+git clone :- https://github.com/inikhilchoudhary/HelpU
 
 2. Install the required dependencies.
 
