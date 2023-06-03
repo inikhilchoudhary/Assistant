@@ -1,5 +1,6 @@
 
-![Assitant](https://github.com/inikhilchoudhary/Assistant/assets/94347474/39b73f4f-07fa-44cc-80cb-1c8c62895bee)
+![Assitant](https://github.com/inikhilchoudhary/HelpU-Assistant-/assets/94347474/307c33db-e291-4525-88ca-02575776340a)
+
 
 
 # HelpU Voice Assistant
